@@ -22,9 +22,9 @@ def list_tasks(
 ) -> list[Task]:
     stmt = select(Task)
     if status is not None:
-        stmt = stmt.where(TaskStatus == status)
+        stmt = stmt.where(Task.status == status)
     if priority is not None:
-        stmt = stmt.where(TaskPriority == priority)
+        stmt = stmt.where(Task.priority == priority)
     if assignee_id is not None:
         stmt = stmt.where(Task.assignee_id == assignee_id)
     stmt = stmt.order_by(Task.created_at.desc()).offset(skip).limit(limit)

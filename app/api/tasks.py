@@ -6,6 +6,7 @@ from app.crud import user as crud_user
 from app.database import get_db
 from app.models.task import TaskPriority, TaskStatus
 from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -18,7 +19,12 @@ def _ensure_assignee_exists(db: Session, assignee_id: int | None) -> None:
         )
 
 
-@router.post("/", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+        "/", 
+        response_model=TaskRead, 
+        status_code=status.HTTP_201_CREATED,
+        dependencies=[Depends(get_current_user)],
+)
 def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
     _ensure_assignee_exists(db, payload.assignee_id)
     return crud_task.create_task(db, payload)
@@ -51,7 +57,11 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
     return task
 
 
-@router.patch("/{task_id}", response_model=TaskRead)
+@router.patch(
+        "/{task_id}", 
+        response_model=TaskRead, 
+        dependencies=[Depends(get_current_user)],
+)
 def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)):
     task = crud_task.get_task(db, task_id)
     if task is None:
@@ -61,7 +71,11 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
     return crud_task.update_task(db, task, payload)
 
 
-@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+        "/{task_id}", 
+        status_code=status.HTTP_204_NO_CONTENT, 
+        dependencies=[Depends(get_current_user)],
+)
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = crud_task.get_task(db, task_id)
     if task is None:

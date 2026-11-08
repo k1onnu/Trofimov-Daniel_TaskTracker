@@ -6,7 +6,7 @@ from app.models.task import TaskPriority, TaskStatus
 
 class TaskBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    discription: str | None = None
+    description: str | None = None
     status: TaskStatus = TaskStatus.new
     priority: TaskPriority = TaskPriority.medium
     due_date: datetime | None = None
@@ -35,4 +35,4 @@ class TaskRead(TaskBase):
 
     id: int
     created_at: datetime
-    update_at: datetime
+    updated_at: datetime
